@@ -4,9 +4,11 @@ import {
   Column,
   OneToMany,
   ManyToOne,
-  JoinColumn,
 } from "typeorm";
 
+/**
+ * Sample payload: order ------- * > order detail
+ */
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn()
@@ -43,6 +45,7 @@ export class OrderDetail {
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
     nullable: false,
+    // triggers the delete when the entity was removed from the order.details.
     orphanedRowAction: "delete",
   })
   order!: Order;
