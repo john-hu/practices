@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package hero;
+
+import "dto/hero.proto";
+
+service HeroService {
+  rpc FindOne(FindOneHeroConditions) returns (Hero) {}
+}

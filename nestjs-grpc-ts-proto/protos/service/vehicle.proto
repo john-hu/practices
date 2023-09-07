@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package vehicle;
+
+import "dto/vehicle.proto";
+
+service VehicleService {
+  rpc FindOne(FindOneVehicleConditions) returns (Vehicle) {}
+  rpc Find(FindVehicleConditions) returns (Vehicles) {}
+}
