@@ -13,6 +13,8 @@ can fix it by removing the `@tailwindcss/forms` from the tailwind.config.js
 * `xlsx__WEBPACK_IMPORTED_MODULE_4__.utils.write is not a function`. This is caused by the module system. It uses
 `import { read, utils } from 'xlsx';` at first. After telling it the issue, it fixed it with
 `import * as XLSX from 'xlsx';` that is correct one.
+* Unable to serve the website under a sub-path. It solves the issue by add the `.env` file to tell the create-react-app
+to setup the site in relative mode
 
 Prompt:
 
@@ -39,4 +41,9 @@ It tells me this error Error: Cannot find module '@tailwindcss/forms' . Please f
 5. Fixing bug 2
 ```
 It shows xlsx__WEBPACK_IMPORTED_MODULE_4__.utils.write is not a function error in the browser when I clicks the convert button. Please fix it.
+```
+
+6. Fixing bug 3
+```
+This project cannot be used under a subpath of a website. Please update the config to use the relative path
 ```
