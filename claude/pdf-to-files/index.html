@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Splitter</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7/download.min.js"></script>
+</head>
+<body>
+    Choose a PDF file and split it: <input type="file" id="pdfFile" accept=".pdf"><br>
+    <button onclick="splitPDF()">Split PDF</button>
+
+    <script>
+        async function splitPDF() {
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a PDF file');
+                return;
+            }
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+            const numberOfPages = pdfDoc.getPageCount();
+
+            const zip = new JSZip();
+
+            for (let i = 0; i < numberOfPages; i++) {
+                const newPdfDoc = await PDFLib.PDFDocument.create();
+                const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [i]);
+                newPdfDoc.addPage(copiedPage);
+
+                const pdfBytes = await newPdfDoc.save();
+                zip.file(`page_${i + 1}.pdf`, pdfBytes);
+            }
+
+            const zipContent = await zip.generateAsync({type: 'blob'});
+            const originalFileName = file.name.replace('.pdf', '');
+            download(zipContent, `${originalFileName}.zip`, "application/zip");
+
+            alert('PDF splitting completed successfully! Downloading zip file.');
+        }
+    </script>
+</body>
+</html>
