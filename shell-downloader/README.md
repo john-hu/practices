@@ -102,4 +102,6 @@ If there is an error, save the error text to `${DOC_ID}.{step-index}.error.txt` 
 * Install the required software `brew install jq`. Suppose the `curl` was already installed. If you don't have it, `brew install curl`
 * Download the list: `fetch-list.sh XYZ`
   * During the download, you will see the page_{n}_response.json file. The `{n}` is a number. We page the whole content in 100 records per file.
+  * If you leave the 2nd parameter empty, it tries to download the whole collection list files, about 76 files.
 * Download the detail content page by page: `download-content.sh downloads/page_{n}_response.json`
+  * We support the 2nd parameter, format. It accepts: `txt`, `pdf`, and `all` as the value. The `all` value downloads txt + pdf. If you give an unknown value, like xyz, the program only download the JSON data without any content files.
