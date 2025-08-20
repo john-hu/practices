@@ -11,13 +11,18 @@ mkdir -p "$DOWNLOAD_DIR"
 
 # Get user query
 if [ "$#" -eq 0 ]; then
-  echo "Please include the list file. [page_1_response.json]"
+  echo "Please include the list file. <page_1_response.json> [txt|pdf|all]"
   exit -1
 else
   RESPONSE_FILE="$1"
+  if [ -z "$2" ]; then
+    FORMAT="txt"
+  else
+    FORMAT="$2"
+  fi
 fi
 
-echo "Load the JSON file: $RESPONSE_FILE"
+print "Load the JSON file: $RESPONSE_FILE"
 
 print() {
   local message="$1"
@@ -38,6 +43,9 @@ if ! cat "$RESPONSE_FILE" | jq . >/dev/null 2>&1; then
   print "Error: Invalid JSON response from API."
   exit 1
 fi
+
+print "Download directory: $DOWNLOAD_DIR"
+print "Download Format: $FORMAT"
 
 # Extract total hits and returned hits
 TOTAL_HITS=$(cat "$RESPONSE_FILE" | jq -r '.response.body.hits.total')
@@ -68,17 +76,21 @@ for i in $(seq 0 $((RETURNED_HITS-1))); do
   cat "$RESPONSE_FILE" | jq ".response.body.hits.hits[$i]" > "$DOWNLOAD_DIR/${DOC_ID}.json" ||
     handle_error "json_save" "$DOC_ID" "Failed to save JSON data"
 
-  # Download HTML content
-  HTML_URL="https://archive.org/stream/${DOC_ID}/${DOC_ID}_djvu.txt"
-  print "Downloading text from $HTML_URL"
-  curl -L -s "$HTML_URL" -o "$DOWNLOAD_DIR/${DOC_ID}.txt.html" ||
-    handle_error "html_download" "$DOC_ID" "Failed to download HTML content"
+  if [ "$FORMAT" = "txt" ] || [ "$FORMAT" = "all" ]; then
+    # Download HTML content
+    HTML_URL="https://archive.org/stream/${DOC_ID}/${DOC_ID}_djvu.txt"
+    print "Downloading text from $HTML_URL"
+    curl -L -s "$HTML_URL" -o "$DOWNLOAD_DIR/${DOC_ID}.txt.html" ||
+      handle_error "html_download" "$DOC_ID" "Failed to download HTML content"
+  fi
 
-  # Download PDF content
-  PDF_URL="https://archive.org/download/${DOC_ID}/${DOC_ID}.pdf"
-  print "Downloading PDF from $PDF_URL"
-  curl -L -s "$PDF_URL" -o "$DOWNLOAD_DIR/${DOC_ID}.pdf" ||
-    handle_error "pdf_download" "$DOC_ID" "Failed to download PDF content"
+  if [ "$FORMAT" = "pdf" ] || [ "$FORMAT" = "all" ]; then
+    # Download PDF content
+    PDF_URL="https://archive.org/download/${DOC_ID}/${DOC_ID}.pdf"
+    print "Downloading PDF from $PDF_URL"
+    curl -L -s "$PDF_URL" -o "$DOWNLOAD_DIR/${DOC_ID}.pdf" ||
+      handle_error "pdf_download" "$DOC_ID" "Failed to download PDF content"
+  fi
 
   # Increment document count
   DOC_COUNT=$((DOC_COUNT+1))

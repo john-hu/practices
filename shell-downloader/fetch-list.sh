@@ -28,7 +28,7 @@ urlencode() {
 
 # Get user query
 if [ "$#" -eq 0 ]; then
-  echo "Please enter your search query:"
+  echo "Please enter your search query <press Enter to download all>:"
   read USER_QUERY
 else
   USER_QUERY="$1"
@@ -56,8 +56,13 @@ handle_error() {
 while true; do
   echo "Fetching page $PAGE..."
 
-  # Construct API URL
-  API_URL="https://archive.org/services/search/beta/page_production/?service_backend=fts&user_query=${USER_QUERY}&page_type=collection_details&page_target=pub_economist&hits_per_page=100&page=${PAGE}&sort=date%3Aasc&aggregations=false&uid=R%3Ad8466fbd5ec58055916a-S%3A3711c14d0804f98be520-P%3A1-K%3Ah-T%3A1755494271483&client_url=https%3A%2F%2Farchive.org%2Fdetails%2Fpub_economist%3Ftab%3Dcollection%26query%3D${ENCODED_QUERY}%26sin%3DTXT%26sort%3Ddate"
+  if [ -z "$USER_QUERY" ]; then
+    API_URL="https://archive.org/services/search/beta/page_production/?user_query=&page_type=collection_details&page_target=pub_economist&hits_per_page=100&page=${PAGE}&aggregations=false"
+  else
+    # Construct API URL
+    API_URL="https://archive.org/services/search/beta/page_production/?service_backend=fts&user_query=${USER_QUERY}&page_type=collection_details&page_target=pub_economist&hits_per_page=100&page=${PAGE}&sort=date%3Aasc&aggregations=false&uid=R%3Ad8466fbd5ec58055916a-S%3A3711c14d0804f98be520-P%3A1-K%3Ah-T%3A1755494271483"
+  fi
+
 
   # Make API request and save response
   RESPONSE=$(curl -s "$API_URL")
